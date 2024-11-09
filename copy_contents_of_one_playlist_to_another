@@ -1,0 +1,26 @@
+from plexapi.server import PlexServer
+import requests
+
+plex_token = "YOUR_PLEX_TOKEN"  # Replace with your actual Plex token
+plex_server_url = "YOUR_PLEX_SERVER_URL"  # Replace with your Plex server URL
+source_playlist_id = SOURCE_PLAYLIST_ID  # Replace with your source playlist ID from Source Playlist URL string
+target_playlist_id = TARGET_PLAYLIST_ID  # Replace with your target playlist ID from existing Target Playlist URL string
+
+# Connect to the Plex server
+plex = PlexServer(plex_server_url, plex_token)
+
+# Get the source and target playlists using their IDs
+source_playlist = plex.fetchItem(source_playlist_id)
+target_playlist = plex.fetchItem(target_playlist_id)
+
+# Get the tracks from the source playlist
+track_ids = [track.ratingKey for track in source_playlist.items()]
+
+# Add the tracks to the target playlist
+for track_id in track_ids:
+    try:
+        target_playlist.addItems(plex.fetchItem(track_id))
+    except requests.exceptions.HTTPError as e:
+        print(f"Error adding track {track_id}: {e}")
+
+print("Playlist copied successfully!")
